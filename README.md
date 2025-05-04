@@ -21,7 +21,7 @@ A browser extension that allows you to quickly navigate from an IMDb movie page 
 3. You will be redirected to the corresponding Letterboxd page for that movie (e.g., `https://letterboxd.com/film/the-equalizer`).
 
 ## :mega: Issues or Suggestions
-Any issues or suggestions, please [create an issue on Github](https://github.com/bellmano/imdb-to-letterboxd_webextension/issues).
+Any issues or suggestions, please [create an issue on Github](https://github.com/bellmano/IMDb-to-Letterboxd_extension/issues).
 
 ## :coffee: Buy me a coffee
 Donations are welcome to appreciate my work to keep this addon alive, but isn't required at all.
