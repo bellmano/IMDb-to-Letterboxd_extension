@@ -18,7 +18,7 @@
     },
     "browser_specific_settings": {
       "gecko": {
-        "id": "imdb-to-letterboxd_webextension@github.com"
+        "id": "IMDb-to-Letterboxd_extension@github.com"
       }
     }
 }
