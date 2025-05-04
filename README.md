@@ -1,0 +1,1 @@
+# imdb-to-letterboxd-webextension
