@@ -3,7 +3,7 @@
 A browser extension that allows you to quickly navigate from an IMDb movie page to the corresponding Letterboxd page.
 
 <a href="https://www.google.com/"><img src="https://user-images.githubusercontent.com/585534/107280622-91a8ea80-6a26-11eb-8d07-77c548b28665.png" alt="Install the extension from the Chrome Web Store."></a>
-<a href="https://addons.mozilla.org/firefox/addon/imdb-to-letterboxd"><img src="https://user-images.githubusercontent.com/585534/107280546-7b9b2a00-6a26-11eb-8f9f-f95932f4bfec.png" alt="Download the extension from the Mozilla Add-ons Store."></a>
+<a href="https://addons.mozilla.org/addon/imdb-to-letterboxd"><img src="https://user-images.githubusercontent.com/585534/107280546-7b9b2a00-6a26-11eb-8f9f-f95932f4bfec.png" alt="Download the extension from the Mozilla Add-ons Store."></a>
 
 ## :sparkles: Features
 
