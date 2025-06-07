@@ -21,3 +21,38 @@ chrome.action.onClicked.addListener(async (tab) => {
     }
   }
 });
+
+// Helper function to check if a URL is an IMDb movie page
+function isImdbMoviePage(url) {
+  return url && url.match(/^https:\/\/www\.imdb\.com\/title\/tt\d+/);
+}
+
+// Enable or disable the action button based on the tab's URL
+function updateActionState(tabId, url) {
+  if (isImdbMoviePage(url)) {
+    chrome.action.enable(tabId);
+  } else {
+    chrome.action.disable(tabId);
+  }
+}
+
+// Listen for tab updates (URL changes)
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.url) {
+    updateActionState(tabId, changeInfo.url);
+  }
+});
+
+// Listen for tab activation (when user switches tabs)
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    updateActionState(activeInfo.tabId, tab.url);
+  });
+});
+
+// On extension startup, check all tabs
+chrome.tabs.query({}, (tabs) => {
+  for (const tab of tabs) {
+    updateActionState(tab.id, tab.url);
+  }
+});
