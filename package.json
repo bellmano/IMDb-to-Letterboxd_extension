@@ -1,0 +1,27 @@
+{
+  "name": "imdb-to-letterboxd-extension",
+  "version": "1.0.0",
+  "description": "Browser extension that allows you to quickly navigate from an IMDb movie page to the corresponding Letterboxd page with one click.",
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "collectCoverageFrom": [
+      "src/background.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"],
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/tests/"
+    ],
+    "transform": {}
+  }
+}
