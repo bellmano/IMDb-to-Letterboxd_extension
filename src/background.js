@@ -1,10 +1,10 @@
 // Listen for the extension icon click
 chrome.action.onClicked.addListener(async (tab) => {
   // Ensure the tab is an IMDb movie page
-  if (tab.url && tab.url.includes("imdb.com/title/")) {
+  if (tab.url?.includes("imdb.com/title/")) {
     try {
       // Extract the IMDb ID from the URL
-      const imdbIdMatch = tab.url.match(/\/title\/(tt\d+)/);
+      const imdbIdMatch = tab.url?.match(/\/title\/(tt\d+)/);
       if (imdbIdMatch && imdbIdMatch[1]) {
         const imdbId = imdbIdMatch[1];
 
@@ -24,7 +24,7 @@ chrome.action.onClicked.addListener(async (tab) => {
 
 // Helper function to check if a URL is an IMDb movie page
 function isImdbMoviePage(url) {
-  return url && url.match(/^https:\/\/www\.imdb\.com\/title\/tt\d+/);
+  return url?.match(/^https:\/\/www\.imdb\.com\/title\/tt\d+/);
 }
 
 // Enable or disable the action button based on the tab's URL
@@ -46,7 +46,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 // Listen for tab activation (when user switches tabs)
 chrome.tabs.onActivated.addListener((activeInfo) => {
   chrome.tabs.get(activeInfo.tabId, (tab) => {
-    updateActionState(activeInfo.tabId, tab.url);
+    updateActionState(activeInfo.tabId, tab?.url);
   });
 });
 
