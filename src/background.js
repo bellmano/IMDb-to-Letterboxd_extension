@@ -3,11 +3,10 @@ chrome.action.onClicked.addListener(async (tab) => {
   // Ensure the tab is an IMDb movie page
   if (tab.url?.includes("imdb.com/title/")) {
     try {
-      // Extract the IMDb ID from the URL
-      const imdbIdMatch = tab.url?.match(/\/title\/(tt\d+)/);
-      if (imdbIdMatch && imdbIdMatch[1]) {
-        const imdbId = imdbIdMatch[1];
+      // Extract the IMDb ID from the URL using optional chaining
+      const imdbId = tab.url?.match(/\/title\/(tt\d+)/)?.[1];
 
+      if (imdbId) {
         // Construct the Letterboxd URL using the IMDb ID
         const letterboxdUrl = `https://letterboxd.com/imdb/${imdbId}/`;
 
