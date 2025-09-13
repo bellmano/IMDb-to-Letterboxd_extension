@@ -26,6 +26,22 @@ Browser extension that allows you to quickly navigate from an IMDb movie page to
 2. Click the IMDb to Letterboxd extension icon in your browser toolbar.
 3. You will be redirected to the corresponding Letterboxd page for that movie (e.g., `https://letterboxd.com/film/the-equalizer`).
 
+
+## :test_tube: Running Tests
+
+To run the tests and view coverage:
+
+1. Install the required dev dependency:
+	```powershell
+	npm install --save-dev ts-node
+	```
+2. Run the test coverage script:
+	```powershell
+	npm run test:coverage
+	```
+
+This will execute the tests and generate a coverage report.
+
 ## :mega: Issues or Suggestions
 Any issues or suggestions, please [create an issue on Github](https://github.com/bellmano/IMDb-to-Letterboxd_extension/issues).
 
