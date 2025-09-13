@@ -10,6 +10,12 @@ describe('Main Script Tests', () => {
     delete require.cache[require.resolve('../src/background.js')];
     require('../src/background.js');
 
+    // Cache listener callbacks before any mocks are cleared later
+    const onClickedListener = chrome.action.onClicked.addListener.mock.calls[0][0];
+    const onUpdatedListener = chrome.tabs.onUpdated.addListener.mock.calls[0][0];
+    const onActivatedListener = chrome.tabs.onActivated.addListener.mock.calls[0][0];
+    const queryCallback = chrome.tabs.query.mock.calls[0][1];
+
     // Verify all listeners are registered
     expect(chrome.action.onClicked.addListener).toHaveBeenCalled();
     expect(chrome.tabs.onUpdated.addListener).toHaveBeenCalled();
@@ -17,7 +23,6 @@ describe('Main Script Tests', () => {
     expect(chrome.tabs.query).toHaveBeenCalledWith({}, expect.any(Function));
 
     // Test chrome.action.onClicked listener
-    const onClickedListener = chrome.action.onClicked.addListener.mock.calls[0][0];
     
     // Test successful IMDb URL processing
     const mockTab = { id: 1, url: 'https://www.imdb.com/title/tt1234567/' };
@@ -65,79 +70,80 @@ describe('Main Script Tests', () => {
     // Reset chrome.tabs.create mock
     chrome.tabs.create.mockReset();
 
-    // Test chrome.tabs.onUpdated listener if it was registered
-    if (chrome.tabs.onUpdated.addListener.mock.calls.length > 0) {
-      const onUpdatedListener = chrome.tabs.onUpdated.addListener.mock.calls[0][0];
-      
-      // Test URL change to IMDb page
-      jest.clearAllMocks();
-      onUpdatedListener(1, { url: 'https://www.imdb.com/title/tt1234567/' }, {});
-      expect(chrome.action.enable).toHaveBeenCalledWith(1);
+    // Test URL change to IMDb page - covers updateActionState and isImdbMoviePage
+    jest.clearAllMocks();
+    onUpdatedListener(1, { url: 'https://www.imdb.com/title/tt1234567/' }, {});
+    expect(chrome.action.enable).toHaveBeenCalledWith(1);
 
-      // Test URL change to non-IMDb page
-      jest.clearAllMocks();
-      onUpdatedListener(1, { url: 'https://www.google.com' }, {});
-      expect(chrome.action.disable).toHaveBeenCalledWith(1);
+    // Test URL change to non-IMDb page - covers updateActionState else branch
+    jest.clearAllMocks();
+    onUpdatedListener(1, { url: 'https://www.google.com' }, {});
+    expect(chrome.action.disable).toHaveBeenCalledWith(1);
 
-      // Test no URL change
-      jest.clearAllMocks();
-      onUpdatedListener(1, { status: 'complete' }, {});
-      expect(chrome.action.enable).not.toHaveBeenCalled();
-      expect(chrome.action.disable).not.toHaveBeenCalled();
-    }
+    // Test no URL change - covers the if condition check
+    jest.clearAllMocks();
+    onUpdatedListener(1, { status: 'complete' }, {});
+    expect(chrome.action.enable).not.toHaveBeenCalled();
+    expect(chrome.action.disable).not.toHaveBeenCalled();
 
-    // Test chrome.tabs.onActivated listener if it was registered
-    if (chrome.tabs.onActivated.addListener.mock.calls.length > 0) {
-      const onActivatedListener = chrome.tabs.onActivated.addListener.mock.calls[0][0];
-      
-      // Test activation with IMDb page
-      jest.clearAllMocks();
-      chrome.tabs.get.mockImplementation((tabId, callback) => {
-        callback({ id: 1, url: 'https://www.imdb.com/title/tt1234567/' });
-      });
-      onActivatedListener({ tabId: 1 });
-      expect(chrome.tabs.get).toHaveBeenCalledWith(1, expect.any(Function));
-      expect(chrome.action.enable).toHaveBeenCalledWith(1);
+    // Test with various URL formats to cover all branches
+    jest.clearAllMocks();
+    onUpdatedListener(1, { url: 'https://www.imdb.com/title/tt0111161' }, {}); // without trailing slash
+    expect(chrome.action.enable).toHaveBeenCalledWith(1);
+    
+    jest.clearAllMocks();
+    onUpdatedListener(1, { url: 'https://www.imdb.com/title/tt0111161/' }, {}); // with trailing slash
+    expect(chrome.action.enable).toHaveBeenCalledWith(1);
+    
+    jest.clearAllMocks();
+    onUpdatedListener(1, { url: 'https://www.imdb.com/title/tt0111161/?ref=test' }, {}); // with parameters
+    expect(chrome.action.enable).toHaveBeenCalledWith(1);
+    
+    jest.clearAllMocks();
+    onUpdatedListener(1, { url: 'https://imdb.com/title/tt0111161/' }, {}); // without www
+    expect(chrome.action.disable).toHaveBeenCalledWith(1);
+    
+    jest.clearAllMocks();
+    onUpdatedListener(1, { url: null }, {}); // null URL -> should not trigger updateActionState
+    expect(chrome.action.enable).not.toHaveBeenCalled();
+    expect(chrome.action.disable).not.toHaveBeenCalled();
 
-      // Test activation with non-IMDb page
-      jest.clearAllMocks();
-      chrome.tabs.get.mockImplementation((tabId, callback) => {
-        callback({ id: 1, url: 'https://www.google.com' });
-      });
-      onActivatedListener({ tabId: 1 });
-      expect(chrome.action.disable).toHaveBeenCalledWith(1);
+    // Test activation with IMDb page
+    jest.clearAllMocks();
+    chrome.tabs.get.mockImplementation((tabId, callback) => {
+      callback({ id: 1, url: 'https://www.imdb.com/title/tt1234567/' });
+    });
+    onActivatedListener({ tabId: 1 });
+    expect(chrome.tabs.get).toHaveBeenCalledWith(1, expect.any(Function));
+    expect(chrome.action.enable).toHaveBeenCalledWith(1);
 
-      // Test activation with undefined URL
-      jest.clearAllMocks();
-      chrome.tabs.get.mockImplementation((tabId, callback) => {
-        callback({ id: 1, url: undefined });
-      });
-      onActivatedListener({ tabId: 1 });
-      expect(chrome.action.disable).toHaveBeenCalledWith(1);
-    }
+    // Test activation with non-IMDb page
+    jest.clearAllMocks();
+    chrome.tabs.get.mockImplementation((tabId, callback) => {
+      callback({ id: 1, url: 'https://www.google.com' });
+    });
+    onActivatedListener({ tabId: 1 });
+    expect(chrome.action.disable).toHaveBeenCalledWith(1);
 
-    // Test startup tab query callback if it was called
-    if (chrome.tabs.query.mock.calls.length > 0) {
-      const queryCallback = chrome.tabs.query.mock.calls[0][1];
-      const mockTabs = [
-        { id: 1, url: 'https://www.imdb.com/title/tt1234567/' },
-        { id: 2, url: 'https://www.google.com' },
-        { id: 3, url: 'https://www.imdb.com/title/tt9876543/' }
-      ];
-      
-      jest.clearAllMocks();
-      queryCallback(mockTabs);
-      expect(chrome.action.enable).toHaveBeenCalledWith(1);
-      expect(chrome.action.disable).toHaveBeenCalledWith(2);
-      expect(chrome.action.enable).toHaveBeenCalledWith(3);
-    }
+    // Test activation with undefined URL
+    jest.clearAllMocks();
+    chrome.tabs.get.mockImplementation((tabId, callback) => {
+      callback({ id: 1, url: undefined });
+    });
+    onActivatedListener({ tabId: 1 });
+    expect(chrome.action.disable).toHaveBeenCalledWith(1);
 
-    // Test isImdbMoviePage function with various URLs
-    // This is tested through the updateActionState calls above, covering:
-    // - Valid IMDb URLs: https://www.imdb.com/title/tt1234567/
-    // - Invalid URLs: https://www.google.com
-    // - Undefined URLs: undefined
-
-    // All code paths in background.js are now covered
+    // Test startup tab query callback
+    const mockTabs = [
+      { id: 1, url: 'https://www.imdb.com/title/tt1234567/' },
+      { id: 2, url: 'https://www.google.com' },
+      { id: 3, url: 'https://www.imdb.com/title/tt9876543/' }
+    ];
+    
+    jest.clearAllMocks();
+    queryCallback(mockTabs);
+    expect(chrome.action.enable).toHaveBeenCalledWith(1);
+    expect(chrome.action.disable).toHaveBeenCalledWith(2);
+    expect(chrome.action.enable).toHaveBeenCalledWith(3);
   });
 });
