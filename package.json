@@ -8,7 +8,8 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0"
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-node": "^10.9.2"
   },
   "jest": {
     "testEnvironment": "jsdom",
@@ -16,8 +17,14 @@
       "src/background.js"
     ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["text", "lcov", "html"],
-    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/tests/"
